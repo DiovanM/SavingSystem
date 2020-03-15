@@ -8,7 +8,8 @@ public class SavingExampleController : MonoBehaviour
     [Space(10)]
     [SerializeField] private Button saveButton;
     [SerializeField] private Button loadButton;
-    [SerializeField] private Button clearSaveButton;
+    [SerializeField] private Button deleteSaveButton;
+    [SerializeField] private Button deleteFolderButton;
     [Header("Position")]
     [SerializeField] private Slider positionX;
     [SerializeField] private Slider positionY;
@@ -37,14 +38,16 @@ public class SavingExampleController : MonoBehaviour
         saveButton.onClick.AddListener(SaveCubeData);
         loadButton.onClick.RemoveAllListeners();
         loadButton.onClick.AddListener(LoadCubeData);
-        clearSaveButton.onClick.RemoveAllListeners();
-        clearSaveButton.onClick.AddListener(DeleteCubeData);
+        deleteSaveButton.onClick.RemoveAllListeners();
+        deleteSaveButton.onClick.AddListener(DeleteExampleData);
+        deleteFolderButton.onClick.RemoveAllListeners();
+        deleteFolderButton.onClick.AddListener(DeleteExampleFolder);
 
-        //Assigning callbacks when data has been loaded and saved
+        //Assigning callbacks to when data has been loaded and saved
         SavingSystem.OnSave += OnDataSaved;
         SavingSystem.OnLoad += OnDataLoaded;
 
-        //Caching cube material
+        //Caching the cube material
         cubeMaterial = cube.GetComponent<Renderer>().material;
     }
 
@@ -78,7 +81,7 @@ public class SavingExampleController : MonoBehaviour
         data.scale = cube.transform.localScale;
         data.color = cubeMaterial.color;
 
-        if (SavingSystem.Save(data, "SaveDataExample", "Example/"))
+        if (SavingSystem.SaveToRoot(data, "SaveDataExample", "Example/"))
             Debug.Log("[SaveTest] Cube data saved to directory");
         else
             Debug.Log("[SaveTest] Cube data failed to save to directory");
@@ -86,10 +89,10 @@ public class SavingExampleController : MonoBehaviour
 
     private void LoadCubeData()
     {
-        if (SavingSystem.SaveExists("SaveDataExample", "Example/"))
+        if (SavingSystem.SaveExistsOnRoot("SaveDataExample", "Example/"))
         {
             //Loading cube data from local directory
-            var data = SavingSystem.Load<CubeExampleData>("SaveDataExample", "Example/");
+            var data = SavingSystem.LoadFromRoot<CubeExampleData>("SaveDataExample", "Example/");
             //Assigning saved cube data to UI elements
             positionX.value = data.position.x;
             positionY.value = data.position.y;
@@ -108,9 +111,14 @@ public class SavingExampleController : MonoBehaviour
             Debug.LogWarning("[SaveTest] No file to load");
     }
 
-    private void DeleteCubeData()
+    private void DeleteExampleData()
     {
-        SavingSystem.DeleteSaveFiles("Example/");
+        SavingSystem.DeleteSaveFileOnRoot("SaveDataExample", "Example/");
+    }
+
+    private void DeleteExampleFolder()
+    {
+        SavingSystem.DeleteAllSaveFiles("Example");
     }
 
     private void OnDataSaved(bool success)

@@ -4,7 +4,8 @@ using System;
 
 public class SavingSystem
 {
-    private static readonly string savePath = Application.persistentDataPath + "/Saves/";
+    private static readonly string rootSavePath = Application.persistentDataPath + "/Saves/";
+    private static string currentSlotPath => rootSavePath + SaveSlotSystem.CurrentSlotDirectory;
     private static readonly string fileFormat = ".json";
 
     public static Action<bool> OnSave;
@@ -12,7 +13,13 @@ public class SavingSystem
 
     public static bool Save<T>(T _object, string key, string subDirectory = "")
     {
-        var path = savePath + subDirectory;
+        var path = SaveSlotSystem.CurrentSlotDirectory + subDirectory;
+        return SaveToRoot<T>(_object, key, path);
+    }
+
+    public static bool SaveToRoot<T>(T _object, string key, string subDirectory = "")
+    {
+        var path = rootSavePath + subDirectory;
         Directory.CreateDirectory(path);
         var jsonObject = JsonUtility.ToJson(_object);
 
@@ -34,11 +41,17 @@ public class SavingSystem
 
     public static T Load<T>(string key, string subDirectory = "")
     {
-        var path = savePath + subDirectory;
+        var path = SaveSlotSystem.CurrentSlotDirectory + subDirectory;
+        return LoadFromRoot<T>(key, path);
+    }
+
+    public static T LoadFromRoot<T>(string key, string subDirectory = "")
+    {
+        var path = rootSavePath + subDirectory;
         T returnData = default(T);
         var data = default(string);
 
-        try 
+        try
         {
             data = File.ReadAllText(path + key + fileFormat);
         }
@@ -58,16 +71,58 @@ public class SavingSystem
 
     public static bool SaveExists(string key, string subDirectory = "")
     {
-        var filePath = savePath + subDirectory + key + fileFormat;
+        var filePath = SaveSlotSystem.CurrentSlotDirectory + subDirectory;
+        return SaveExistsOnRoot(filePath);
+    }
+
+    public static bool SaveExistsOnRoot(string key, string subDirectory = "")
+    {
+        var filePath = rootSavePath + subDirectory + key + fileFormat;
         return File.Exists(filePath);
     }
 
-    public static void DeleteSaveFiles(string subDirectory = "")
+    public static bool DeleteSaveFile(string key, string subDirectory = "")
     {
-        var directory = new DirectoryInfo(savePath + subDirectory);
+        var filePath = SaveSlotSystem.CurrentSlotDirectory + subDirectory;
+        return DeleteSaveFileOnRoot(key, filePath);
+    }
+
+    public static bool DeleteSaveFileOnRoot(string key, string subDirectory = "")
+    {
+        var filePath = rootSavePath + subDirectory + key + fileFormat;
+        if (File.Exists(filePath))
+        {
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SaveFileSystem] Failed to delete file on address: {filePath} Exception: {e.ToString()}");
+                return false;
+            }
+            Debug.Log($"[SaveFileSystem] File deleted on address: {filePath}");
+            return true;
+        }
+        Debug.LogWarning($"[SaveFileSystem] Failed to delete file on address: {filePath} File does not exist");
+        return false;
+    }
+
+    public static void DeleteAllSaveFiles(string subDirectory = "")
+    {
+        var directory = new DirectoryInfo(rootSavePath + subDirectory);
         directory.Delete(true);
-        Debug.Log($"[SaveFileSystem] Files deleted on address: {savePath + subDirectory}");
-        Directory.CreateDirectory(savePath);
+        Debug.Log($"[SaveFileSystem] Files deleted on address: {rootSavePath + subDirectory}");
+        Directory.CreateDirectory(rootSavePath);
+    }
+
+    public static DirectoryInfo[] GetFoldersInDirectory(string startingWith = null, string subDirectory = "")
+    {
+        var directory = new DirectoryInfo(rootSavePath + subDirectory);
+        if (string.IsNullOrEmpty(startingWith))
+            return directory.GetDirectories();
+        else
+            return directory.GetDirectories(startingWith);
     }
 
 }
