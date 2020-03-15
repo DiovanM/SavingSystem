@@ -41,8 +41,8 @@ public class SavingExampleController : MonoBehaviour
         clearSaveButton.onClick.AddListener(DeleteCubeData);
 
         //Assigning callbacks when data has been loaded and saved
-        SaveFileSystem.OnSave += OnDataSaved;
-        SaveFileSystem.OnLoad += OnDataLoaded;
+        SavingSystem.OnSave += OnDataSaved;
+        SavingSystem.OnLoad += OnDataLoaded;
 
         //Caching cube material
         cubeMaterial = cube.GetComponent<Renderer>().material;
@@ -65,8 +65,8 @@ public class SavingExampleController : MonoBehaviour
 
     private void OnDestroy()
     {
-        SaveFileSystem.OnSave -= OnDataSaved;
-        SaveFileSystem.OnLoad -= OnDataLoaded;
+        SavingSystem.OnSave -= OnDataSaved;
+        SavingSystem.OnLoad -= OnDataLoaded;
     }
 
     private void SaveCubeData()
@@ -78,7 +78,7 @@ public class SavingExampleController : MonoBehaviour
         data.scale = cube.transform.localScale;
         data.color = cubeMaterial.color;
 
-        if (SaveFileSystem.Save(data, "SaveDataExample", "Example/"))
+        if (SavingSystem.Save(data, "SaveDataExample", "Example/"))
             Debug.Log("[SaveTest] Cube data saved to directory");
         else
             Debug.Log("[SaveTest] Cube data failed to save to directory");
@@ -86,10 +86,10 @@ public class SavingExampleController : MonoBehaviour
 
     private void LoadCubeData()
     {
-        if (SaveFileSystem.SaveExists("SaveDataExample", "Example/"))
+        if (SavingSystem.SaveExists("SaveDataExample", "Example/"))
         {
             //Loading cube data from local directory
-            var data = SaveFileSystem.Load<CubeExampleData>("SaveDataExample", "Example/");
+            var data = SavingSystem.Load<CubeExampleData>("SaveDataExample", "Example/");
             //Assigning saved cube data to UI elements
             positionX.value = data.position.x;
             positionY.value = data.position.y;
@@ -110,7 +110,7 @@ public class SavingExampleController : MonoBehaviour
 
     private void DeleteCubeData()
     {
-        SaveFileSystem.DeleteSaveFiles("Example/");
+        SavingSystem.DeleteSaveFiles("Example/");
     }
 
     private void OnDataSaved(bool success)

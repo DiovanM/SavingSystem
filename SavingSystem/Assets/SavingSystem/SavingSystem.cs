@@ -2,7 +2,7 @@
 using System.IO;
 using System;
 
-public class SaveFileSystem
+public class SavingSystem
 {
     private static readonly string savePath = Application.persistentDataPath + "/Saves/";
     private static readonly string fileFormat = ".json";

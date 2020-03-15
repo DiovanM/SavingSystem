@@ -7,6 +7,6 @@ public class SaveSystemEditorUtils : MonoBehaviour
     static void DeleteSaveFiles()
     {
         if (EditorUtility.DisplayDialog("Save files deletion", "Are you sure you want to delete the save files? This is irreversible.", "Confirm", "Cancel"))
-            SaveFileSystem.DeleteSaveFiles();
+            SavingSystem.DeleteSaveFiles();
     }
 }
