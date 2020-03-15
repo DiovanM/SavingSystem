@@ -611,7 +611,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: CLEAR SAVE
+  m_Text: DELETE SAVE FILE
 --- !u!222 &179309703
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7218,7 +7218,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: CLEAR FOLDER
+  m_Text: DELETE FOLDER
 --- !u!222 &1974766756
 CanvasRenderer:
   m_ObjectHideFlags: 0

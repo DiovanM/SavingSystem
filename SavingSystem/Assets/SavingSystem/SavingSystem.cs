@@ -72,7 +72,7 @@ public class SavingSystem
     public static bool SaveExists(string key, string subDirectory = "")
     {
         var filePath = SaveSlotSystem.CurrentSlotDirectory + subDirectory;
-        return SaveExistsOnRoot(filePath);
+        return SaveExistsOnRoot(key, filePath);
     }
 
     public static bool SaveExistsOnRoot(string key, string subDirectory = "")
@@ -108,12 +108,31 @@ public class SavingSystem
         return false;
     }
 
-    public static void DeleteAllSaveFiles(string subDirectory = "")
+    public static bool DeleteDirectory(string subDirectory)
     {
         var directory = new DirectoryInfo(rootSavePath + subDirectory);
-        directory.Delete(true);
-        Debug.Log($"[SaveFileSystem] Files deleted on address: {rootSavePath + subDirectory}");
-        Directory.CreateDirectory(rootSavePath);
+        if(directory.Exists)
+        {
+            directory.Delete(true);
+            Debug.Log($"[SaveFileSystem] Directory deleted: {directory.FullName}");
+            return true;
+        }
+        Debug.LogWarning($"[SaveFileSystem] Failed to delete directory on address {directory.FullName} - Directory not found");
+        return false;
+    }
+
+    public static bool DeleteAllSaveFiles(string subDirectory = "")
+    {
+        var directory = new DirectoryInfo(rootSavePath + subDirectory);
+        if(directory.Exists)
+        {
+            directory.Delete(true);
+            Debug.Log($"[SaveFileSystem] Files deleted on directory: {directory.FullName}");
+            Directory.CreateDirectory(rootSavePath);
+            return true;
+        }
+        Debug.LogWarning($"[SaveFileSystem] Failed to delete files on directory: {directory.FullName} - Directory not found");
+        return false;
     }
 
     public static DirectoryInfo[] GetFoldersInDirectory(string startingWith = null, string subDirectory = "")

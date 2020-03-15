@@ -9,10 +9,14 @@ public class SaveSlotSystem : MonoBehaviour
     public static int currentSlotId { get; private set; } = 1;
     public static SaveSlotBaseData currentSaveSlotData;
 
-    private static readonly string saveDirectory = "Save";
-    private static readonly string saveSlotKey = "SlotData";
+    private static readonly string defaultSaveDirectory = "Save";
+    private static string saveDirectory = defaultSaveDirectory;
+    private static readonly string saveSlotDataKey = "SlotData";
 
     public static string CurrentSlotDirectory => $"{saveDirectory + currentSlotId}/";// == null ? $"{saveDirectory + 1}/" : $"{saveDirectory + currentSaveSlotData.id}/";
+
+    public static void SetDirectoryAddress(string directory) => saveDirectory = directory;
+    public static void ResetDirectoryAddress() => saveDirectory = defaultSaveDirectory;
 
     public static bool SetCurrentSlot(int id)
     {
@@ -34,12 +38,12 @@ public class SaveSlotSystem : MonoBehaviour
     public static void UpdateCurrentSlotData(string name, float playTime, float completionPercentage)
     {
         var data = new SaveSlotBaseData(currentSaveSlotData.id, name, playTime, completionPercentage);
-        SavingSystem.SaveToRoot(data, saveSlotKey, $"{saveDirectory + data.id}/");
+        SavingSystem.SaveToRoot(data, saveSlotDataKey, $"{saveDirectory + data.id}/");
     }
 
     public static void SaveSlotData(SaveSlotBaseData data)
     {
-        SavingSystem.SaveToRoot(data, saveSlotKey, $"{saveDirectory + data.id}/");
+        SavingSystem.SaveToRoot(data, saveSlotDataKey, $"{saveDirectory + data.id}/");
     }
 
     public static List<SaveSlotBaseData> GetSaveSlotsData()
@@ -48,13 +52,15 @@ public class SaveSlotSystem : MonoBehaviour
         var saveFiles = new List<SaveSlotBaseData>();
         foreach (var folder in saveFolders)
         {
-            var file = SavingSystem.LoadFromRoot<SaveSlotBaseData>(saveSlotKey, $"{folder.Name}/");
+            var file = SavingSystem.LoadFromRoot<SaveSlotBaseData>(saveSlotDataKey, $"{folder.Name}/");
             if (file != null)
                 saveFiles.Add(file);
         }
 
         return saveFiles;
     }
+
+    public static bool DeleteAllSlotData(int id) => SavingSystem.DeleteDirectory(saveDirectory + id);
 
     private static List<DirectoryInfo> GetAllSaveFolders()
     {

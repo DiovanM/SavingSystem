@@ -49,6 +49,10 @@ public class SavingExampleController : MonoBehaviour
 
         //Caching the cube material
         cubeMaterial = cube.GetComponent<Renderer>().material;
+
+        SaveSlotSystem.SetDirectoryAddress("Example");
+        SaveSlotSystem.SaveSlotData(new SaveSlotBaseData());
+        SaveSlotSystem.SetCurrentSlot(1);
     }
 
     private void FixedUpdate()
@@ -81,7 +85,7 @@ public class SavingExampleController : MonoBehaviour
         data.scale = cube.transform.localScale;
         data.color = cubeMaterial.color;
 
-        if (SavingSystem.SaveToRoot(data, "SaveDataExample", "Example/"))
+        if (SavingSystem.Save(data, "SaveDataExample"))
             Debug.Log("[SaveTest] Cube data saved to directory");
         else
             Debug.Log("[SaveTest] Cube data failed to save to directory");
@@ -89,10 +93,10 @@ public class SavingExampleController : MonoBehaviour
 
     private void LoadCubeData()
     {
-        if (SavingSystem.SaveExistsOnRoot("SaveDataExample", "Example/"))
+        if (SavingSystem.SaveExists("SaveDataExample"))
         {
             //Loading cube data from local directory
-            var data = SavingSystem.LoadFromRoot<CubeExampleData>("SaveDataExample", "Example/");
+            var data = SavingSystem.Load<CubeExampleData>("SaveDataExample");
             //Assigning saved cube data to UI elements
             positionX.value = data.position.x;
             positionY.value = data.position.y;
@@ -111,15 +115,9 @@ public class SavingExampleController : MonoBehaviour
             Debug.LogWarning("[SaveTest] No file to load");
     }
 
-    private void DeleteExampleData()
-    {
-        SavingSystem.DeleteSaveFileOnRoot("SaveDataExample", "Example/");
-    }
+    private void DeleteExampleData() => SavingSystem.DeleteSaveFile("SaveDataExample");
 
-    private void DeleteExampleFolder()
-    {
-        SavingSystem.DeleteAllSaveFiles("Example");
-    }
+    private void DeleteExampleFolder() => SaveSlotSystem.DeleteAllSlotData(SaveSlotSystem.currentSlotId);
 
     private void OnDataSaved(bool success)
     {
